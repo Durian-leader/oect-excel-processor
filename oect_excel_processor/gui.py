@@ -495,7 +495,7 @@ class OECTProcessorGUI:
             self.msg_queue.put(("log", ("未找到Excel文件", "warning")))
             return
         
-        results = processor.process_all_files(use_multiprocessing=True)
+        results = processor.process_all_files(use_multiprocessing=False)
         summary = processor.get_processing_summary(results)
         
         self.msg_queue.put(("log", (f"成功: {summary['successful_files']}, 失败: {summary['failed_files']}", 
