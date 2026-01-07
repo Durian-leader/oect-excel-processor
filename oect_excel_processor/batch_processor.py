@@ -107,18 +107,13 @@ class BatchExcelProcessor:
             excel_data = pd.ExcelFile(excel_file)
             all_sheets = excel_data.sheet_names
             
-            # 确保工作表类型列表长度与工作表数量匹配
-            sheet_types = self.sheet_types.copy()
-            if len(sheet_types) < len(all_sheets):
-                sheet_types.extend(['transfer'] * (len(all_sheets) - len(sheet_types)))
-            elif len(sheet_types) > len(all_sheets):
-                sheet_types = sheet_types[:len(all_sheets)]
-            
             # 存储此文件生成的所有CSV文件
             file_csv_outputs = []
             
-            # 处理每个工作表
-            for j, (sheet_name, sheet_type) in enumerate(zip(all_sheets, sheet_types)):
+            # 处理每个工作表，使用模运算循环应用类型序列
+            for j, sheet_name in enumerate(all_sheets):
+                # 循环使用sheet_types序列
+                sheet_type = self.sheet_types[j % len(self.sheet_types)]
                 # 读取工作表数据
                 sheet_data = pd.read_excel(excel_file, sheet_name=sheet_name, header=None)
                 
@@ -222,18 +217,13 @@ class BatchExcelProcessor:
                     excel_data = pd.ExcelFile(excel_file)
                     all_sheets = excel_data.sheet_names
                     
-                    # 确保工作表类型列表长度与工作表数量匹配
-                    sheet_types = self.sheet_types.copy()
-                    if len(sheet_types) < len(all_sheets):
-                        sheet_types.extend(['transfer'] * (len(all_sheets) - len(sheet_types)))
-                    elif len(sheet_types) > len(all_sheets):
-                        sheet_types = sheet_types[:len(all_sheets)]
-                    
                     # 存储此文件生成的所有CSV文件
                     file_csv_outputs = []
                     
-                    # 处理每个工作表
-                    for j, (sheet_name, sheet_type) in enumerate(zip(all_sheets, sheet_types)):
+                    # 处理每个工作表，使用模运算循环应用类型序列
+                    for j, sheet_name in enumerate(all_sheets):
+                        # 循环使用sheet_types序列
+                        sheet_type = self.sheet_types[j % len(self.sheet_types)]
                         # 读取工作表数据
                         sheet_data = pd.read_excel(excel_file, sheet_name=sheet_name, header=None)
                         
