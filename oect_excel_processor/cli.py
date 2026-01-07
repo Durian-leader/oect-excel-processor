@@ -108,7 +108,7 @@ def main(args: Optional[List[str]] = None) -> int:
     single_parser.add_argument(
         '--sheet-types', '-t', 
         default='transfer,transient',
-        help='工作表类型列表，以逗号分隔，例如: transfer,transient,transfer'
+        help='工作表类型序列，以逗号分隔，会循环应用到所有工作表。例如: transfer,transient 或 transient,transfer,transfer'
     )
     single_parser.add_argument(
         '--output-prefix', '-o',
@@ -127,7 +127,7 @@ def main(args: Optional[List[str]] = None) -> int:
     batch_parser.add_argument(
         '--sheet-types', '-t',
         default='transfer,transient',
-        help='工作表类型列表，以逗号分隔，例如: transfer,transient,transfer'
+        help='工作表类型序列，以逗号分隔，会循环应用到所有工作表。例如: transfer,transient'
     )
     batch_parser.add_argument(
         '--output-prefix', '-o',

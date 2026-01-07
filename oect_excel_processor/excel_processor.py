@@ -122,6 +122,9 @@ class ExcelProcessor:
         """
         处理Excel文件中的所有工作表并保存为CSV
         
+        sheet_types序列会循环应用到所有工作表:
+        - 例如 ['transfer', 'transient'] + 4个sheet → transfer, transient, transfer, transient
+        
         Returns:
             保存的CSV文件路径列表
         """
@@ -131,16 +134,13 @@ class ExcelProcessor:
         # 获取所有工作表
         all_sheets = excel_file.sheet_names
         
-        # 确保工作表类型列表长度与工作表数量匹配
-        if len(self.sheet_types) < len(all_sheets):
-            self.sheet_types.extend(['transfer'] * (len(all_sheets) - len(self.sheet_types)))
-        elif len(self.sheet_types) > len(all_sheets):
-            self.sheet_types = self.sheet_types[:len(all_sheets)]
-        
         saved_files = []
         
-        # 处理每个工作表
-        for i, (sheet_name, sheet_type) in enumerate(zip(all_sheets, self.sheet_types)):
+        # 处理每个工作表，使用模运算循环应用类型序列
+        for i, sheet_name in enumerate(all_sheets):
+            # 循环使用sheet_types序列
+            sheet_type = self.sheet_types[i % len(self.sheet_types)]
+            
             # 读取工作表数据
             sheet_data = pd.read_excel(self.file_path, sheet_name=sheet_name, header=None)
             
@@ -159,7 +159,7 @@ class ExcelProcessor:
     
     def get_sheet_info(self) -> Dict[str, str]:
         """
-        获取Excel文件中所有工作表的信息
+        获取Excel文件中所有工作表的信息（使用循环类型序列）
         
         Returns:
             工作表名称和类型的字典
@@ -167,10 +167,6 @@ class ExcelProcessor:
         excel_file = pd.ExcelFile(self.file_path)
         all_sheets = excel_file.sheet_names
         
-        # 确保工作表类型列表长度与工作表数量匹配
-        if len(self.sheet_types) < len(all_sheets):
-            self.sheet_types.extend(['transfer'] * (len(all_sheets) - len(self.sheet_types)))
-        elif len(self.sheet_types) > len(all_sheets):
-            self.sheet_types = self.sheet_types[:len(all_sheets)]
-        
-        return {sheet: sheet_type for sheet, sheet_type in zip(all_sheets, self.sheet_types)} 
+        # 使用模运算循环应用类型序列
+        return {sheet: self.sheet_types[i % len(self.sheet_types)] 
+                for i, sheet in enumerate(all_sheets)} 

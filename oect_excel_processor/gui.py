@@ -58,8 +58,7 @@ class OECTProcessorGUI:
         # 状态变量
         self.selected_path = tk.StringVar(value="")
         self.is_batch_mode = tk.BooleanVar(value=False)
-        self.transfer_enabled = tk.BooleanVar(value=True)
-        self.transient_enabled = tk.BooleanVar(value=True)
+        self.sheet_types_str = tk.StringVar(value="transfer,transient")
         self.output_prefix = tk.StringVar(value="processed_")
         self.is_processing = False
         
@@ -228,44 +227,39 @@ class OECTProcessorGUI:
         options_frame = tk.Frame(parent, bg=ModernStyle.BG_SECONDARY, padx=15, pady=15)
         options_frame.pack(fill=tk.X, pady=(0, 15))
         
-        # 工作表类型选择
+        # 工作表类型序列输入
         sheet_frame = tk.Frame(options_frame, bg=ModernStyle.BG_SECONDARY)
         sheet_frame.pack(fill=tk.X, pady=(0, 10))
         
         sheet_label = tk.Label(
             sheet_frame,
-            text="工作表类型:",
+            text="类型序列:",
             font=(ModernStyle.FONT_FAMILY, ModernStyle.FONT_SIZE_NORMAL),
             fg=ModernStyle.TEXT_PRIMARY,
             bg=ModernStyle.BG_SECONDARY
         )
         sheet_label.pack(side=tk.LEFT)
         
-        transfer_cb = tk.Checkbutton(
+        sheet_entry = tk.Entry(
             sheet_frame,
-            text="Transfer",
-            variable=self.transfer_enabled,
+            textvariable=self.sheet_types_str,
             font=(ModernStyle.FONT_FAMILY, ModernStyle.FONT_SIZE_NORMAL),
             fg=ModernStyle.TEXT_PRIMARY,
-            bg=ModernStyle.BG_SECONDARY,
-            selectcolor=ModernStyle.BG_TERTIARY,
-            activebackground=ModernStyle.BG_SECONDARY,
-            activeforeground=ModernStyle.TEXT_PRIMARY
+            bg=ModernStyle.BG_TERTIARY,
+            insertbackground=ModernStyle.TEXT_PRIMARY,
+            relief=tk.FLAT,
+            width=30
         )
-        transfer_cb.pack(side=tk.LEFT, padx=(15, 5))
+        sheet_entry.pack(side=tk.LEFT, padx=(15, 0), ipady=5)
         
-        transient_cb = tk.Checkbutton(
+        hint_label = tk.Label(
             sheet_frame,
-            text="Transient",
-            variable=self.transient_enabled,
-            font=(ModernStyle.FONT_FAMILY, ModernStyle.FONT_SIZE_NORMAL),
-            fg=ModernStyle.TEXT_PRIMARY,
-            bg=ModernStyle.BG_SECONDARY,
-            selectcolor=ModernStyle.BG_TERTIARY,
-            activebackground=ModernStyle.BG_SECONDARY,
-            activeforeground=ModernStyle.TEXT_PRIMARY
+            text="(如: transfer,transient 循环应用)",
+            font=(ModernStyle.FONT_FAMILY, ModernStyle.FONT_SIZE_SMALL),
+            fg=ModernStyle.TEXT_SECONDARY,
+            bg=ModernStyle.BG_SECONDARY
         )
-        transient_cb.pack(side=tk.LEFT, padx=5)
+        hint_label.pack(side=tk.LEFT, padx=(10, 0))
         
         # 输出前缀
         prefix_frame = tk.Frame(options_frame, bg=ModernStyle.BG_SECONDARY)
@@ -387,13 +381,18 @@ class OECTProcessorGUI:
             self._log(f"已选择: {path}", "info")
     
     def _get_sheet_types(self) -> List[str]:
-        """获取选中的工作表类型"""
-        types = []
-        if self.transfer_enabled.get():
-            types.append("transfer")
-        if self.transient_enabled.get():
-            types.append("transient")
-        return types
+        """解析类型序列字符串"""
+        types_str = self.sheet_types_str.get().strip()
+        if not types_str:
+            return ['transfer', 'transient']  # 默认值
+        
+        # 支持逗号、空格、分号分隔
+        import re
+        types = re.split(r'[,;\s]+', types_str.lower())
+        
+        # 过滤无效类型
+        valid_types = [t for t in types if t in ('transfer', 'transient')]
+        return valid_types if valid_types else ['transfer', 'transient']
     
     def _log(self, message: str, tag: str = None):
         """添加日志消息"""
