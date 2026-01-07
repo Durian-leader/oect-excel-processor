@@ -17,11 +17,7 @@
 | **单文件** | 处理单个 Excel 文件 |
 | **批量处理** | 处理整个文件夹中的所有 Excel 文件 |
 
-### 3. 选择文件/文件夹
-
-点击 **「选择文件」** 或 **「选择文件夹」** 按钮
-
-### 4. 配置类型序列
+### 3. 配置类型序列
 
 在**「类型序列」**输入框中设置工作表类型，以逗号分隔：
 
@@ -31,21 +27,25 @@
 | `transient` | 所有工作表都按 transient 处理 |
 | `transfer,transfer,transient` | 2:1 比例循环 |
 
-### 5. 点击开始处理
+### 4. 点击开始处理
 
 点击 **「⚡ 开始处理」** 按钮，等待处理完成。
 
 ---
 
-## 界面说明
+## 处理模式示例
 
-### 主界面
+### 单文件模式
 
-![主界面](assets/gui_main.png)
+选择单个 Excel 文件进行处理：
 
-### 处理完成
+![单文件模式](assets/single_file_mode.png)
 
-![处理完成](assets/gui_complete.png)
+### 批量处理模式
+
+选择包含多个 Excel 文件的文件夹进行批量处理：
+
+![批量处理模式](assets/batch_mode.png)
 
 ---
 
@@ -57,7 +57,7 @@ CSV 文件保存在与源文件相同的目录，命名格式：
 {前缀}-{序号}-{类型}.csv
 ```
 
-例如：`processed_-1-transfer.csv`
+例如：`processed_-1-transfer.csv`, `processed_-2-transient.csv`
 
 ---
 
