@@ -4,16 +4,12 @@
 
 ## 功能特点
 
-- 支持两种类型的工作表处理：
-  - `transfer`类型：从第三行开始有字段名，共四列数据
-  - `transient`类型：第三行前两列是字段名，数据按每两列一组排列，需要合并
-- 可以处理包含多个工作表的Excel文件
-- 自动将每个工作表转换为单独的CSV文件
-- 支持自定义输出文件名前缀
-- 自动去除transient类型工作表中的空行和不完整数据行
-- 支持批量处理多个Excel文件，并按自然排序处理
-- 支持多核并行处理，加速批量文件处理
-- 提供命令行工具，方便直接使用
+- ✨ **图形界面** - 提供易用的GUI应用，支持单文件和批量处理
+- 📊 支持两种工作表类型：`transfer` 和 `transient`
+- 🔄 **类型序列循环** - 工作表类型序列会自动循环应用到所有工作表
+- 📁 支持批量处理多个Excel文件
+- 🧹 自动去除空行和不完整数据行
+- 📦 可打包为独立exe运行
 
 ## 安装
 
@@ -33,112 +29,67 @@ pip install -e .
 
 ## 使用方法
 
-### 作为Python库使用
+### 图形界面 (推荐)
 
-#### 单个Excel文件处理
+启动GUI应用：
+
+```bash
+oect-gui
+```
+
+或直接运行 `OECT-Excel-Processor.exe`
+
+![单文件模式](assets/single_file_mode.png)
+
+详细使用说明请参阅 [用户手册](USER_MANUAL.md)
+
+### 命令行工具
+
+```bash
+# 单文件处理
+oect-processor single data.xls -t transfer,transient
+
+# 批量处理
+oect-processor batch ./data_folder -t transfer,transient
+```
+
+### Python API
 
 ```python
-from oect_excel_processor import ExcelProcessor
+from oect_excel_processor import ExcelProcessor, BatchExcelProcessor
 
-# 创建处理器实例
-excel_file = "your_excel_file.xls"
-sheet_types = ["transfer", "transient", "transfer", "transfer"]
-output_prefix = "output"
-
-processor = ExcelProcessor(excel_file, sheet_types, output_prefix)
+# 单文件处理
+processor = ExcelProcessor("data.xls", ["transfer", "transient"], "output")
 saved_files = processor.process_and_save()
 
-print("保存的CSV文件:")
-for file in saved_files:
-    print(f"- {file}")
+# 批量处理
+batch = BatchExcelProcessor("./data_folder", sheet_types=["transfer", "transient"])
+results = batch.process_all_files()
 ```
 
-#### 批量处理Excel文件
+## 类型序列说明
 
-```python
-from oect_excel_processor import BatchExcelProcessor
+类型序列会**循环应用**到所有工作表：
 
-# 创建批处理器实例
-batch_processor = BatchExcelProcessor(
-    directory="your_directory",
-    file_pattern="*.xls",
-    sheet_types=["transfer", "transient"],
-    output_prefix="batch_output"
-)
+| 类型序列 | 4个工作表的处理结果 |
+|---------|-------------------|
+| `transfer,transient` | Sheet1=transfer, Sheet2=transient, Sheet3=transfer, Sheet4=transient |
+| `transient` | 全部按transient处理 |
+| `transfer,transfer,transient` | 2:1比例循环 |
 
-# 使用多核处理加速
-results = batch_processor.process_all_files(
-    output_dir="csv_output",
-    use_multiprocessing=True,  # 启用多进程处理
-    max_workers=None  # 自动使用所有可用CPU核心
-)
+## 工作表类型
 
-# 获取处理摘要
-summary = batch_processor.get_processing_summary(results)
-print(f"总Excel文件数: {summary['total_excel_files']}")
-print(f"成功处理的文件数: {summary['successful_files']}")
-print(f"生成的CSV文件总数: {summary['total_csv_files']}")
-```
-
-### 作为命令行工具使用
-
-安装后，可以使用`oect-processor`命令行工具：
-
-#### 处理单个文件
-
-```bash
-oect-processor single your_excel_file.xls --sheet-types transfer,transient --output-prefix output
-```
-
-#### 批量处理文件
-
-```bash
-oect-processor batch your_directory --pattern "*.xls" --sheet-types transfer,transient --output-prefix batch_output --output-dir csv_output --multiprocessing
-```
-
-## 工作表类型说明
-
-### transfer类型
-
-- 从第三行开始，第三行包含字段名
-- 总共有四列数据
-- 从第四行开始是实际数据
-
-### transient类型
-
-- 第三行的前两列是字段名
-- 数据按每两列一组排列（AB, CD, EF等）
-- 每组的数据应该连接在一起
-- 从第四行开始是实际数据
-- 自动去除空行和不完整的数据行
+- **transfer**: 从第三行开始，共四列数据
+- **transient**: 数据按每两列一组排列，自动合并
 
 ## 输出文件
 
-输出的CSV文件将按照以下格式命名：
-
 ```
-{output_prefix}-{sheet_index}-{sheet_type}.csv
+{前缀}-{序号}-{类型}.csv
 ```
 
-例如，如果`output_prefix`设置为"data"，则输出文件将为：
-- data-1-transfer.csv
-- data-2-transient.csv
-- 等等
-
-对于批处理，输出文件名格式为：
-
-```
-{output_prefix}-{file_index}-{sheet_index}-{sheet_type}.csv
-```
-
-## 示例
-
-包中提供了几个示例脚本，展示如何使用该包：
-
-- `single_file_example.py`: 展示如何处理单个Excel文件
-- `batch_processing_example.py`: 展示如何批量处理Excel文件
-- `multiprocessing_comparison.py`: 展示多核处理与单核处理的性能对比
+例如：`processed_-1-transfer.csv`, `processed_-2-transient.csv`
 
 ## 许可证
 
-MIT 
+MIT
