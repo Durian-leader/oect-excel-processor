@@ -37,6 +37,7 @@ setup(
         "pandas>=1.0.0",
         "numpy>=1.18.0",
         "natsort>=7.0.0",
+        "xlrd>=2.0.1",
     ],
     extras_require={
         "dev": [
@@ -50,6 +51,9 @@ setup(
     entry_points={
         "console_scripts": [
             "oect-processor=oect_excel_processor.cli:main",
+        ],
+        "gui_scripts": [
+            "oect-gui=oect_excel_processor.gui:main",
         ],
     },
     include_package_data=True,
