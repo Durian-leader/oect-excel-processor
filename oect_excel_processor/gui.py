@@ -14,8 +14,13 @@ from tkinter import ttk, filedialog, messagebox
 from typing import List, Optional
 import queue
 
-from .excel_processor import ExcelProcessor
-from .batch_processor import BatchExcelProcessor
+try:
+    from .excel_processor import ExcelProcessor
+    from .batch_processor import BatchExcelProcessor
+except ImportError:
+    # 当作为独立脚本运行时（如PyInstaller打包后）
+    from oect_excel_processor.excel_processor import ExcelProcessor
+    from oect_excel_processor.batch_processor import BatchExcelProcessor
 
 
 class ModernStyle:
